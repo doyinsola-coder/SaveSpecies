@@ -17,52 +17,71 @@ export default function SpeciesSearch() {
     setSpeciesData(null);
 
     try {
-      // Search for species using GBIF API
-      const gbifResponse = await fetch(
-        `https://api.gbif.org/v1/species/match?name=${encodeURIComponent(searchTerm)}`
+      // First, try to get suggestions/matches from GBIF (more flexible)
+      const suggestResponse = await fetch(
+        `https://api.gbif.org/v1/species/suggest?q=${encodeURIComponent(searchTerm)}&limit=5`
       );
-      const gbifData = await gbifResponse.json();
+      const suggestions = await suggestResponse.json();
 
-      if (gbifData.matchType === "NONE") {
-        setError("Species not found. Please try another name.");
+      // If no suggestions, show error
+      if (!suggestions || suggestions.length === 0) {
+        setError(`No species found for "${searchTerm}". Try using the scientific name or check spelling.`);
         setLoading(false);
         return;
       }
 
-      // Get additional details from GBIF
-      const speciesKey = gbifData.usageKey;
+      // Use the first (best) match
+      const bestMatch = suggestions[0];
+      const speciesKey = bestMatch.key;
+
+      // Get detailed species information
       const detailsResponse = await fetch(
         `https://api.gbif.org/v1/species/${speciesKey}`
       );
       const detailsData = await detailsResponse.json();
 
-      // Get Wikipedia summary
+      // Try to get Wikipedia data with multiple name variations
       let wikipediaData = null;
-      try {
-        const wikiResponse = await fetch(
-          `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(gbifData.scientificName || searchTerm)}`
-        );
-        if (wikiResponse.ok) {
-          wikipediaData = await wikiResponse.json();
+      const searchNames = [
+        detailsData.canonicalName,
+        detailsData.scientificName,
+        bestMatch.canonicalName,
+        searchTerm
+      ].filter(Boolean);
+
+      for (const name of searchNames) {
+        try {
+          const wikiResponse = await fetch(
+            `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name)}`
+          );
+          if (wikiResponse.ok) {
+            const data = await wikiResponse.json();
+            if (data.extract && data.type !== 'disambiguation') {
+              wikipediaData = data;
+              break;
+            }
+          }
+        } catch (err) {
+          continue;
         }
-      } catch (err) {
-        console.log("Wikipedia data not available");
       }
 
       // Get species images from GBIF
       const imagesResponse = await fetch(
-        `https://api.gbif.org/v1/occurrence/search?taxonKey=${speciesKey}&mediaType=StillImage&limit=6`
+        `https://api.gbif.org/v1/occurrence/search?taxonKey=${speciesKey}&mediaType=StillImage&limit=12`
       );
       const imagesData = await imagesResponse.json();
       
+      // Extract and deduplicate images
       const images = imagesData.results
         ?.filter(r => r.media && r.media.length > 0)
-        .slice(0, 6)
-        .map(r => r.media[0].identifier) || [];
+        .flatMap(r => r.media.map(m => m.identifier))
+        .filter((img, idx, arr) => arr.indexOf(img) === idx) // Remove duplicates
+        .slice(0, 6) || [];
 
       setSpeciesData({
-        scientificName: detailsData.scientificName || gbifData.scientificName,
-        commonName: detailsData.vernacularName || gbifData.vernacularName || "N/A",
+        scientificName: detailsData.canonicalName || detailsData.scientificName || bestMatch.scientificName,
+        commonName: detailsData.vernacularName || bestMatch.vernacularNames?.[0] || "N/A",
         kingdom: detailsData.kingdom || "N/A",
         phylum: detailsData.phylum || "N/A",
         class: detailsData.class || "N/A",
@@ -70,15 +89,15 @@ export default function SpeciesSearch() {
         family: detailsData.family || "N/A",
         genus: detailsData.genus || "N/A",
         taxonomicStatus: detailsData.taxonomicStatus || "N/A",
-        rank: detailsData.rank || "N/A",
-        description: wikipediaData?.extract || "No description available.",
+        rank: detailsData.rank || bestMatch.rank || "N/A",
+        description: wikipediaData?.extract || "No description available. Try searching on Wikipedia for more information.",
         thumbnail: wikipediaData?.thumbnail?.source || null,
-        wikiUrl: wikipediaData?.content_urls?.desktop?.page || null,
+        wikiUrl: wikipediaData?.content_urls?.desktop?.page || `https://en.wikipedia.org/wiki/${encodeURIComponent(detailsData.canonicalName || searchTerm)}`,
         images: images,
       });
     } catch (err) {
       console.error("Error fetching species data:", err);
-      setError("Failed to fetch species information. Please try again.");
+      setError(`Failed to fetch information for "${searchTerm}". Please try again or use the scientific name.`);
     } finally {
       setLoading(false);
     }
@@ -115,7 +134,7 @@ export default function SpeciesSearch() {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search species (e.g., African Elephant, Panthera leo)..."
+                placeholder="Search species (e.g., Elephant, Panthera leo, Rose)..."
                 className="w-full pl-12 pr-4 py-3 border-2 border-emerald-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
             </div>
@@ -141,8 +160,8 @@ export default function SpeciesSearch() {
             animate={{ opacity: 1 }}
             className="max-w-2xl mx-auto mb-6 p-4 bg-red-100 text-red-700 rounded-lg flex items-center gap-2"
           >
-            <AlertCircle className="w-5 h-5" />
-            {error}
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <span>{error}</span>
           </motion.div>
         )}
 
@@ -163,7 +182,7 @@ export default function SpeciesSearch() {
                 />
               )}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center text-white">
+                <div className="text-center text-white px-4">
                   <h2 className="text-4xl font-bold mb-2">
                     {speciesData.commonName}
                   </h2>
@@ -187,7 +206,7 @@ export default function SpeciesSearch() {
                   {speciesData.description}
                 </p>
                 {speciesData.wikiUrl && (
-                  <a
+                  
                     href={speciesData.wikiUrl}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -208,54 +227,23 @@ export default function SpeciesSearch() {
                   </h3>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-emerald-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-600 mb-1">Kingdom</p>
-                    <p className="font-semibold text-emerald-700">
-                      {speciesData.kingdom}
-                    </p>
-                  </div>
-                  <div className="bg-emerald-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-600 mb-1">Phylum</p>
-                    <p className="font-semibold text-emerald-700">
-                      {speciesData.phylum}
-                    </p>
-                  </div>
-                  <div className="bg-emerald-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-600 mb-1">Class</p>
-                    <p className="font-semibold text-emerald-700">
-                      {speciesData.class}
-                    </p>
-                  </div>
-                  <div className="bg-emerald-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-600 mb-1">Order</p>
-                    <p className="font-semibold text-emerald-700">
-                      {speciesData.order}
-                    </p>
-                  </div>
-                  <div className="bg-emerald-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-600 mb-1">Family</p>
-                    <p className="font-semibold text-emerald-700">
-                      {speciesData.family}
-                    </p>
-                  </div>
-                  <div className="bg-emerald-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-600 mb-1">Genus</p>
-                    <p className="font-semibold text-emerald-700">
-                      {speciesData.genus}
-                    </p>
-                  </div>
-                  <div className="bg-emerald-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-600 mb-1">Rank</p>
-                    <p className="font-semibold text-emerald-700">
-                      {speciesData.rank}
-                    </p>
-                  </div>
-                  <div className="bg-emerald-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-600 mb-1">Status</p>
-                    <p className="font-semibold text-emerald-700">
-                      {speciesData.taxonomicStatus}
-                    </p>
-                  </div>
+                  {[
+                    { label: "Kingdom", value: speciesData.kingdom },
+                    { label: "Phylum", value: speciesData.phylum },
+                    { label: "Class", value: speciesData.class },
+                    { label: "Order", value: speciesData.order },
+                    { label: "Family", value: speciesData.family },
+                    { label: "Genus", value: speciesData.genus },
+                    { label: "Rank", value: speciesData.rank },
+                    { label: "Status", value: speciesData.taxonomicStatus },
+                  ].map((item, idx) => (
+                    <div key={idx} className="bg-emerald-50 p-4 rounded-lg">
+                      <p className="text-sm text-gray-600 mb-1">{item.label}</p>
+                      <p className="font-semibold text-emerald-700">
+                        {item.value}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -273,7 +261,7 @@ export default function SpeciesSearch() {
                       <motion.div
                         key={idx}
                         whileHover={{ scale: 1.05 }}
-                        className="relative h-48 rounded-lg overflow-hidden shadow-md cursor-pointer"
+                        className="relative h-48 rounded-lg overflow-hidden shadow-md cursor-pointer bg-gray-100"
                       >
                         <img
                           src={img}

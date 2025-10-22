@@ -13,7 +13,7 @@ import {
   Cell,
 } from "recharts";
 import { TrendingUp, TrendingDown, Activity } from "lucide-react";
-import { Card } from "./ui/Card"; // adjust path if needed
+import { Card } from "./ui/Card"; // adjust import path
 import { conservationStats } from "../lib/species-data"; // adjust path
 
 export default function StatisticsSection() {
@@ -120,28 +120,30 @@ export default function StatisticsSection() {
             </div>
           </Card>
 
-          {/* Bar Chart */}
+          {/* Bar Chart (Scrollable on small screens) */}
           <Card className="p-4 sm:p-6">
             <h3 className="mb-4 sm:mb-6 text-lg sm:text-xl font-semibold">
               Threatened Species by Group
             </h3>
-            <div className="w-full h-64 sm:h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={habitatData} margin={{ bottom: 40 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="habitat"
-                    angle={-35}
-                    textAnchor="end"
-                    height={60}
-                    interval={0}
-                    tick={{ fontSize: 10 }}
-                  />
-                  <YAxis tick={{ fontSize: 10 }} />
-                  <Tooltip />
-                  <Bar dataKey="threatened" fill="#2E7D32" name="Threatened Species" />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-emerald-200">
+              <div className="min-w-[420px] sm:min-w-full h-64 sm:h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={habitatData} margin={{ bottom: 40 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="habitat"
+                      angle={-35}
+                      textAnchor="end"
+                      height={60}
+                      interval={0}
+                      tick={{ fontSize: 10 }}
+                    />
+                    <YAxis tick={{ fontSize: 10 }} />
+                    <Tooltip />
+                    <Bar dataKey="threatened" fill="#2E7D32" name="Threatened Species" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </Card>
         </div>

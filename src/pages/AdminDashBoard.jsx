@@ -12,7 +12,22 @@ import {
   Search,
   Download,
 } from "lucide-react";
-import api from "../utils/axiosInstance";
+import axios from "axios";
+
+// ✅ Updated axios instance setup
+const api = axios.create({
+  baseURL:
+    import.meta.env.VITE_API_BASE_URL ||
+    "https://savespeciesexpress.onrender.com/api", // fallback to Render backend
+  withCredentials: true,
+});
+
+// ✅ Attach token if it exists
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
 export default function AdminDashboard() {
   const [reports, setReports] = useState([]);
@@ -35,13 +50,25 @@ export default function AdminDashboard() {
   const fetchReports = async () => {
     try {
       setLoading(true);
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setMessage("⚠️ Please log in first to access reports");
+        setLoading(false);
+        return;
+      }
+
       const res = await api.get("/reports");
       console.log("Reports fetched:", res.data);
       setReports(res.data);
       calculateStats(res.data);
     } catch (error) {
       console.error("Error fetching reports:", error);
-      setMessage("❌ Failed to load reports");
+      setMessage(
+        error.response?.status === 401
+          ? "❌ Unauthorized: Please log in again"
+          : "❌ Failed to load reports"
+      );
     } finally {
       setLoading(false);
     }
@@ -90,7 +117,7 @@ export default function AdminDashboard() {
     const csvData = filteredReports.map((r) => [
       r.speciesName,
       r.issueType,
-      r.description.replace(/,/g, ";"), // Replace commas to avoid CSV issues
+      r.description.replace(/,/g, ";"),
       r.status,
       new Date(r.createdAt).toLocaleDateString(),
       r.user?.name || "Unknown",
@@ -293,7 +320,10 @@ export default function AdminDashboard() {
               <tbody className="divide-y divide-gray-200">
                 {filteredReports.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                    <td
+                      colSpan="6"
+                      className="px-6 py-8 text-center text-gray-500"
+                    >
                       No reports found
                     </td>
                   </tr>

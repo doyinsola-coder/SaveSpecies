@@ -206,16 +206,16 @@ export default function SpeciesSearch() {
                   {speciesData.description}
                 </p>
                 {speciesData.wikiUrl && (
-                  
-                    href={speciesData.wikiUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 mt-4 text-emerald-600 hover:text-emerald-700 font-medium"
-                  >
-                    <Globe className="w-4 h-4" />
-                    Read more on Wikipedia
-                  </a>
-                )}
+  <a
+  href={speciesData.wikiUrl}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex items-center gap-2 mt-4 text-emerald-600 hover:text-emerald-700 font-medium"
+>
+  <Globe className="w-4 h-4" />
+  Read more on Wikipedia
+</a>
+)}
               </div>
 
               {/* Taxonomy */}

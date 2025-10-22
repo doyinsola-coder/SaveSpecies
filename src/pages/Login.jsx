@@ -34,7 +34,7 @@ export default function LoginPage() {
     
     try {
       //  send login request
-      const res = await api.post("/users/login", formData);
+      const res = await api.post("/api/users/login", formData);
   
       if (res.status === 200 && res.data.token) {
         localStorage.setItem("token", res.data.token);

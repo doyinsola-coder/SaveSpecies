@@ -29,7 +29,7 @@ export default function Profile() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userRes = await api.get("/users/profile");
+        const userRes = await api.get("/api/users/profile");
         setUser(userRes.data);
         setFormData({ name: userRes.data.name, email: userRes.data.email });
 
@@ -44,7 +44,7 @@ export default function Profile() {
 
         // Fetch species with error handling
         try {
-          const speciesRes = await api.get("/species/supported");
+          const speciesRes = await api.get("/api/species/supported");
           setSupportedSpecies(speciesRes.data || []);
         } catch (err) {
           console.error("Error fetching species:", err);
@@ -53,7 +53,7 @@ export default function Profile() {
 
         // Fetch reports with error handling
         try {
-          const reportsRes = await api.get("/reports/user");
+          const reportsRes = await api.get("/api/reports/user");
           setReports(reportsRes.data || []);
         } catch (err) {
           console.error("Error fetching reports:", err);

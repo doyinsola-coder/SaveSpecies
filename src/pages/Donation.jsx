@@ -25,7 +25,7 @@ export default function Donate() {
     setStatus(null);
 
     try {
-      const res = await fetch("http://localhost:3000/api/paystack/initialize", {
+      const res = await fetch("https://savespeciesexpress.onrender.com/api/paystack/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

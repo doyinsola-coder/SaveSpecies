@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000/api/", // your backend base URL
+  baseURL: "https://savespeciesexpress.onrender.com", // your backend base URL
 });
 
 // Add a request interceptor to include token

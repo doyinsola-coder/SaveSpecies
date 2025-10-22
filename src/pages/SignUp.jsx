@@ -35,7 +35,7 @@ export default function SignupPage() {
     setMessage("");
 
     try {
-      const res = await axios.post("http://localhost:3000/api/users/register", formData);
+      const res = await axios.post("https://savespeciesexpress.onrender.com/api/users/register", formData);
       
       if (res.status === 201 || res.status === 200) {
         setMessage("✅ Account created successfully!");

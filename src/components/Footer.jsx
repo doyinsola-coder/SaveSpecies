@@ -2,20 +2,30 @@ import React, { useState } from "react";
 import { Heart, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import emailjs from "emailjs-com";
-import { FaTwitter, FaGithub, FaInstagram, FaLinkedin, FaYoutube } from "react-icons/fa";
+import {
+  FaTwitter,
+  FaGithub,
+  FaInstagram,
+  FaLinkedin,
+  FaYoutube,
+} from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState(""); // "sending" | "success" | "error"
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
+    if (!email.trim()) return;
+
     setStatus("sending");
 
     try {
-      const templateParams = { user_email: email };
+      const templateParams = {
+        user_email: email,
+      };
 
       await emailjs.send(
         import.meta.env.VITE_EMAILJS_SERVICE_ID,
@@ -26,9 +36,12 @@ export function Footer() {
 
       setStatus("success");
       setEmail("");
+
+      setTimeout(() => setStatus(""), 3000);
     } catch (error) {
       console.error("EmailJS Error:", error);
       setStatus("error");
+      setTimeout(() => setStatus(""), 3000);
     }
   };
 
@@ -48,14 +61,23 @@ export function Footer() {
           >
             <div className="flex items-center gap-3">
               <div className="bg-white p-2 rounded-xl">
-                <Heart className="h-5 w-5 text-emerald-600" fill="currentColor" />
+                <Heart
+                  className="h-5 w-5 text-emerald-600"
+                  fill="currentColor"
+                />
               </div>
-              <span className="font-bold text-xl tracking-wide">SaveSpecies</span>
+              <span className="font-bold text-xl tracking-wide">
+                SaveSpecies
+              </span>
             </div>
 
             <p className="text-sm text-white/80 leading-relaxed">
-              Protecting biodiversity and ensuring every species thrives.  
-              Supporting <span className="font-semibold text-emerald-300">UN SDG 14 & 15</span>.
+              Protecting biodiversity and ensuring every species thrives.{" "}
+              Supporting{" "}
+              <span className="font-semibold text-emerald-300">
+                UN SDG 14 & 15
+              </span>
+              .
             </p>
 
             <div className="flex gap-3">
@@ -85,7 +107,9 @@ export function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <h4 className="text-lg font-semibold mb-4 text-emerald-300">Quick Links</h4>
+            <h4 className="text-lg font-semibold mb-4 text-emerald-300">
+              Quick Links
+            </h4>
             <ul className="space-y-2 text-sm">
               {[
                 { name: "Home", link: "/" },
@@ -95,58 +119,60 @@ export function Footer() {
                 { name: "Contact", link: "/contact" },
               ].map((item) => (
                 <li key={item.name}>
-                  <a
-                    href={item.link}
+                  <Link
+                    to={item.link}
                     className="text-white/70 hover:text-emerald-300 transition-colors"
                   >
                     {item.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
           </motion.div>
 
-          
-
-{/* Resources */}
-<motion.div
-  initial={{ opacity: 0, y: 30 }}
-  whileInView={{ opacity: 1, y: 0 }}
-  transition={{ delay: 0.2 }}
->
-  <h4 className="text-lg font-semibold mb-4 text-emerald-300">Resources</h4>
-  <ul className="space-y-2 text-sm">
-    {[
-      { name: "IUCN Red List", path: "https://www.iucnredlist.org/", external: true },
-      { name: "Conservation Tips", path: "/tips" },
-      { name: "Educational Resources", path: "/resources" },
-      { name: "Partner Organizations", path: "/partners" },
-      { name: "Research Articles", path: "/research" },
-    ].map((item) => (
-      <li key={item.name}>
-        {item.external ? (
-          <a
-            href={item.path}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white/70 hover:text-emerald-300 transition-colors"
+          {/* Resources */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
           >
-            {item.name}
-          </a>
-        ) : (
-          <Link
-            to={item.path}
-            className="text-white/70 hover:text-emerald-300 transition-colors"
-          >
-            {item.name}
-          </Link>
-        )}
-      </li>
-    ))}
-  </ul>
-</motion.div>
-
-
+            <h4 className="text-lg font-semibold mb-4 text-emerald-300">
+              Resources
+            </h4>
+            <ul className="space-y-2 text-sm">
+              {[
+                {
+                  name: "IUCN Red List",
+                  path: "https://www.iucnredlist.org/",
+                  external: true,
+                },
+                { name: "Conservation Tips", path: "/tips" },
+                { name: "Educational Resources", path: "/resources" },
+                { name: "Partner Organizations", path: "/partners" },
+                { name: "Research Articles", path: "/research" },
+              ].map((item) => (
+                <li key={item.name}>
+                  {item.external ? (
+                    <a
+                      href={item.path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white/70 hover:text-emerald-300 transition-colors"
+                    >
+                      {item.name}
+                    </a>
+                  ) : (
+                    <Link
+                      to={item.path}
+                      className="text-white/70 hover:text-emerald-300 transition-colors"
+                    >
+                      {item.name}
+                    </Link>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
 
           {/* Newsletter */}
           <motion.div
@@ -154,12 +180,18 @@ export function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <h4 className="text-lg font-semibold mb-4 text-emerald-300">Stay Updated</h4>
+            <h4 className="text-lg font-semibold mb-4 text-emerald-300">
+              Stay Updated
+            </h4>
             <p className="text-sm text-white/80 mb-4">
-              Get conservation news, stories, and updates straight to your inbox.
+              Get conservation news, stories, and updates straight to your
+              inbox.
             </p>
 
-            <form onSubmit={handleSubscribe} className="flex gap-2">
+            <form
+              onSubmit={handleSubscribe}
+              className="flex flex-col sm:flex-row gap-2"
+            >
               <input
                 type="email"
                 value={email}
@@ -171,17 +203,25 @@ export function Footer() {
               <button
                 type="submit"
                 disabled={status === "sending"}
-                className="bg-emerald-500 hover:bg-emerald-400 text-white p-2 rounded-lg transition"
+                className="bg-emerald-500 hover:bg-emerald-400 text-white p-2 rounded-lg transition flex items-center justify-center"
               >
-                <Mail className="h-4 w-4" />
+                {status === "sending" ? (
+                  <span className="text-sm">Sending...</span>
+                ) : (
+                  <Mail className="h-4 w-4" />
+                )}
               </button>
             </form>
 
             {status === "success" && (
-              <p className="text-emerald-300 text-sm mt-3">✅ Subscribed successfully!</p>
+              <p className="text-emerald-300 text-sm mt-3">
+                ✅ Subscribed successfully!
+              </p>
             )}
             {status === "error" && (
-              <p className="text-red-400 text-sm mt-3">❌ Failed to subscribe. Try again.</p>
+              <p className="text-red-400 text-sm mt-3">
+                ❌ Failed to subscribe. Try again.
+              </p>
             )}
           </motion.div>
         </div>
@@ -196,11 +236,22 @@ export function Footer() {
           className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-white/70"
         >
           <p>
-            © {currentYear} <span className="font-semibold text-emerald-300">SaveSpecies</span>. All rights reserved.
+            © {currentYear}{" "}
+            <span className="font-semibold text-emerald-300">SaveSpecies</span>
+            . All rights reserved.
           </p>
-          <div className="flex gap-6">
-            {["Privacy Policy", "Terms of Service", "Cookie Policy", "Accessibility"].map((item) => (
-              <a key={item} href="#" className="hover:text-emerald-300 transition-colors">
+          <div className="flex flex-wrap justify-center gap-6">
+            {[
+              "Privacy Policy",
+              "Terms of Service",
+              "Cookie Policy",
+              "Accessibility",
+            ].map((item) => (
+              <a
+                key={item}
+                href="#"
+                className="hover:text-emerald-300 transition-colors"
+              >
                 {item}
               </a>
             ))}

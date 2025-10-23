@@ -15,7 +15,7 @@ export default function SignupPage() {
     Gender: "",
   });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState({ type: "", text: "" });
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
@@ -26,19 +26,29 @@ export default function SignupPage() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+    // Clear message when user starts typing
+    if (message.text) setMessage({ type: "", text: "" });
   };
 
   // Handle submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
+    setMessage({ type: "", text: "" });
 
     try {
-      const res = await axios.post("https://savespeciesexpress.onrender.com/api/users/register", formData);
-      
+      const res = await axios.post(
+        "https://savespeciesexpress.onrender.com/api/users/register",
+        formData
+      );
+
       if (res.status === 201 || res.status === 200) {
-        setMessage("✅ Account created successfully!");
+        setMessage({
+          type: "success",
+          text: "✅ Account created successfully! Redirecting...",
+        });
+        
+        // Clear form
         setFormData({
           name: "",
           email: "",
@@ -47,18 +57,69 @@ export default function SignupPage() {
           address: "",
           Gender: "",
         });
-        localStorage.setItem("token", res.data.token);
         
+        // Store token if provided
+        if (res.data.token) {
+          localStorage.setItem("token", res.data.token);
+        }
+
         // Navigate to profile after successful registration
         setTimeout(() => {
           navigate("/profile");
         }, 1500);
       }
-     } catch (error) {
-  console.error(error);
-  console.error("Error details:", error.response?.data); 
-  setMessage("❌ Failed to register. Please check your details.");
-}
+    } catch (error) {
+      console.error("Error details:", error.response?.data);
+
+      // Handle specific error cases
+      if (error.response) {
+        // Server responded with error status
+        const status = error.response.status;
+        const errorData = error.response.data;
+
+        if (status === 409 || errorData?.message?.toLowerCase().includes("already exists")) {
+          // User already exists
+          setMessage({
+            type: "error",
+            text: "❌ An account with this email already exists. Try logging in instead.",
+          });
+        } else if (status === 400) {
+          // Validation error
+          const errorMsg = errorData?.message || errorData?.error || "Invalid input. Please check your details.";
+          setMessage({
+            type: "error",
+            text: `❌ ${errorMsg}`,
+          });
+        } else if (status === 500) {
+          // Server error
+          setMessage({
+            type: "error",
+            text: "❌ Server error. Please try again later.",
+          });
+        } else {
+          // Other errors
+          const errorMsg = errorData?.message || errorData?.error || "Registration failed. Please try again.";
+          setMessage({
+            type: "error",
+            text: `❌ ${errorMsg}`,
+          });
+        }
+      } else if (error.request) {
+        // Request was made but no response received (network error)
+        setMessage({
+          type: "error",
+          text: "❌ Network error. Please check your internet connection and try again.",
+        });
+      } else {
+        // Something else happened
+        setMessage({
+          type: "error",
+          text: "❌ An unexpected error occurred. Please try again.",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -79,6 +140,21 @@ export default function SignupPage() {
           </p>
         </div>
 
+        {/* Success/Error Message */}
+        {message.text && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`mb-4 p-3 rounded-lg text-sm text-center font-medium ${
+              message.type === "success"
+                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                : "bg-red-50 text-red-700 border border-red-200"
+            }`}
+          >
+            {message.text}
+          </motion.div>
+        )}
+
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {/* Name */}
           <div className="flex items-center border rounded-lg p-2">
@@ -90,6 +166,7 @@ export default function SignupPage() {
               value={formData.name}
               onChange={handleChange}
               required
+              disabled={loading}
               className="w-full outline-none"
             />
           </div>
@@ -104,6 +181,7 @@ export default function SignupPage() {
               value={formData.email}
               onChange={handleChange}
               required
+              disabled={loading}
               className="w-full outline-none"
             />
           </div>
@@ -118,6 +196,7 @@ export default function SignupPage() {
               value={formData.password}
               onChange={handleChange}
               required
+              disabled={loading}
               className="w-full outline-none pr-8"
             />
             <motion.div
@@ -139,6 +218,7 @@ export default function SignupPage() {
               value={formData.phoneNumber}
               onChange={handleChange}
               required
+              disabled={loading}
               className="w-full outline-none"
             />
           </div>
@@ -153,6 +233,7 @@ export default function SignupPage() {
               value={formData.address}
               onChange={handleChange}
               required
+              disabled={loading}
               className="w-full outline-none"
             />
           </div>
@@ -168,6 +249,7 @@ export default function SignupPage() {
               value={formData.Gender}
               onChange={handleChange}
               required
+              disabled={loading}
               className="outline-none text-gray-700"
             >
               <option value="">Select</option>
@@ -181,21 +263,11 @@ export default function SignupPage() {
             type="submit"
             disabled={loading}
             whileTap={{ scale: 0.95 }}
-            className="bg-emerald-600 text-white font-semibold py-2 rounded-lg hover:bg-emerald-700 transition-all"
+            className="bg-emerald-600 text-white font-semibold py-2 rounded-lg hover:bg-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Creating Account..." : "Sign Up"}
           </motion.button>
         </form>
-
-        {message && (
-          <p
-            className={`mt-4 text-sm text-center ${
-              message.startsWith("✅") ? "text-emerald-600" : "text-red-500"
-            }`}
-          >
-            {message}
-          </p>
-        )}
 
         {/* Animated "Go to Login" Section */}
         <motion.div

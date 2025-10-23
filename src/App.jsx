@@ -18,6 +18,7 @@ import PartnerOrganizations from './pages/PartnerOrganizations'
 import EducationalResources from './pages/EducationalResources'
 import ConservationTips from './pages/ConservationTips'
 import AdminDashboard from './pages/AdminDashBoard'
+import { ForgotPasswordPage, ResetPasswordPage } from './pages/ForgotPassword';
 function App() {
 
   return (
@@ -43,6 +44,8 @@ function App() {
 <Route path='/research' element={<ResearchArticles />} /> 
 <Route path='/tips' element={<ConservationTips />} /> 
 <Route path='/admin' element={<AdminDashboard />} /> 
+<Route path="/forgot-password" element={<ForgotPasswordPage />} />
+<Route path="/reset-password/:token" element={<ResetPasswordPage />} />
     </Routes>
     <Footer />
     </BrowserRouter>

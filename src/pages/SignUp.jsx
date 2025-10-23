@@ -45,7 +45,7 @@ export default function SignupPage() {
       if (res.status === 201 || res.status === 200) {
         setMessage({
           type: "success",
-          text: "✅ Account created successfully! Redirecting...",
+          text: "✅ Account created successfully!",
         });
         
         // Clear form
@@ -265,7 +265,7 @@ export default function SignupPage() {
             whileTap={{ scale: 0.95 }}
             className="bg-emerald-600 text-white font-semibold py-2 rounded-lg hover:bg-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Creating Account..." : "Sign Up"}
+            {loading ? "Creating your Account..." : "Sign Up"}
           </motion.button>
         </form>
 

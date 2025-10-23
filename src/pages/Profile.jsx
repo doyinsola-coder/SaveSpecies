@@ -364,7 +364,7 @@ export default function Profile() {
           reportData.image = e.target.image.value;
         }
 
-        const res = await api.post("/reports", reportData);
+        const res = await api.post("/api/reports", reportData);
         setReportMessage("✅ Report submitted successfully!");
         setReports([res.data, ...reports]); // Add new report to the top
         e.target.reset();

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://savespeciesexpress.onrender.com", // backend base URL
+  baseURL: "http://localhost:3000", // backend base URL
   withCredentials: true, // ✅ important for cross-origin cookies or auth
 });
 

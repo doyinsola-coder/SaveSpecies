@@ -18,7 +18,7 @@ import axios from "axios";
 const api = axios.create({
   baseURL:
     import.meta.env.VITE_API_BASE_URL ||
-    "https://savespeciesexpress.onrender.com/api", // fallback to Render backend
+    "http://localhost:3000", // fallback to Render backend
   withCredentials: true,
 });
 

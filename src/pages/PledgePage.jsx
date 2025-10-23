@@ -14,7 +14,7 @@ export default function PledgePage() {
   useEffect(() => {
     const fetchPledges = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/pledges");
+        const res = await fetch("https://savespeciesexpress.onrender.com/api/pledges");
         const data = await res.json();
         setPledges(data);
       } catch (error) {
@@ -36,7 +36,7 @@ export default function PledgePage() {
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:3000/api/pledges", {
+      const res = await fetch("https://savespeciesexpress.onrender.com/api/pledges", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

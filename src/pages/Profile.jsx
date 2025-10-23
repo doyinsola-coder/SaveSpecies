@@ -12,7 +12,7 @@ import {
   ImageIcon,
   FileText,
 } from "lucide-react";
-import api from "../utils/axiosInstance"; // your axios instance that attaches token
+import api from "../utils/axiosInstance"; // axios instance that attaches token
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -187,7 +187,6 @@ export default function Profile() {
               <div className="relative -mt-16">
                 <div className="w-32 h-32 rounded-full bg-white p-1 shadow-lg">
                   {avatarPreview ? (
-                    // eslint-disable-next-line jsx-a11y/img-redundant-alt
                     <img src={avatarPreview} alt="avatar" className="w-full h-full object-cover rounded-full" />
                   ) : (
                     <div className="w-full h-full rounded-full bg-green-100 flex items-center justify-center text-green-600 text-3xl">

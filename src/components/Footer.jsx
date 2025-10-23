@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { Heart, Mail } from "lucide-react";
 import { motion } from "framer-motion";
-import emailjs from "emailjs-com";
 import {
   FaTwitter,
   FaGithub,
@@ -13,37 +12,6 @@ import { Link } from "react-router-dom";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState(""); // "sending" | "success" | "error"
-
-  const handleSubscribe = async (e) => {
-    e.preventDefault();
-    if (!email.trim()) return;
-
-    setStatus("sending");
-
-    try {
-      const templateParams = {
-        user_email: email,
-      };
-
-      await emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        templateParams,
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-      );
-
-      setStatus("success");
-      setEmail("");
-
-      setTimeout(() => setStatus(""), 3000);
-    } catch (error) {
-      console.error("EmailJS Error:", error);
-      setStatus("error");
-      setTimeout(() => setStatus(""), 3000);
-    }
-  };
 
   return (
     <footer className="bg-green-700 text-white relative overflow-hidden">
@@ -189,40 +157,28 @@ export function Footer() {
             </p>
 
             <form
-              onSubmit={handleSubscribe}
+              action="https://formsubmit.co/abdulateefdoyinsolaabdulmubeen@gmail.com"
+              method="POST"
               className="flex flex-col sm:flex-row gap-2"
             >
+              <input type="hidden" name="_subject" value="New Newsletter Subscription!" />
+              <input type="hidden" name="_captcha" value="false" />
+              <input type="hidden" name="_template" value="table" />
+              
               <input
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name="email"
                 placeholder="Your email"
                 required
                 className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-emerald-400"
               />
               <button
                 type="submit"
-                disabled={status === "sending"}
                 className="bg-emerald-500 hover:bg-emerald-400 text-white p-2 rounded-lg transition flex items-center justify-center"
               >
-                {status === "sending" ? (
-                  <span className="text-sm">Sending...</span>
-                ) : (
-                  <Mail className="h-4 w-4" />
-                )}
+                <Mail className="h-4 w-4" />
               </button>
             </form>
-
-            {status === "success" && (
-              <p className="text-emerald-300 text-sm mt-3">
-                ✅ Subscribed successfully!
-              </p>
-            )}
-            {status === "error" && (
-              <p className="text-red-400 text-sm mt-3">
-                ❌ Failed to subscribe. Try again.
-              </p>
-            )}
           </motion.div>
         </div>
 

@@ -1,43 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import emailjs from "emailjs-com";
 import { Mail, MapPin, Phone } from "lucide-react";
 
 export default function Contact() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
-  const [status, setStatus] = useState("");
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setStatus("Sending...");
-
-    emailjs
-      .send(
-        "service_yourID", // 🔹 Replace with your EmailJS service ID
-        "template_yourID", // 🔹 Replace with your EmailJS template ID
-        formData,
-        "your_public_key"  // 🔹 Replace with your EmailJS public key
-      )
-      .then(
-        () => {
-          setStatus("Message sent successfully!");
-          setFormData({ name: "", email: "", message: "" });
-        },
-        (error) => {
-          console.error(error);
-          setStatus("Failed to send. Please try again later.");
-        }
-      );
-  };
-
   return (
     <section className="min-h-screen bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto max-w-4xl">
@@ -56,7 +21,7 @@ export default function Contact() {
               Get in Touch
             </h2>
             <p className="text-gray-600 mb-6">
-              Have questions, suggestions, or want to collaborate? Reach out to us—we’d love to hear from you.
+              Have questions, suggestions, or want to collaborate? Reach out to us—we'd love to hear from you.
             </p>
 
             <div className="flex items-center gap-3 text-gray-700">
@@ -75,9 +40,15 @@ export default function Contact() {
 
           {/* Contact Form */}
           <form
-            onSubmit={handleSubmit}
+            action="https://formsubmit.co/abdulateefdoyinsolaabdulmubeen@gmail.com"
+            method="POST"
             className="bg-white shadow-md rounded-2xl p-6 border border-gray-100"
           >
+            {/* FormSubmit Configuration */}
+            <input type="hidden" name="_subject" value="New Contact Form Submission - SaveSpecies" />
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="hidden" name="_template" value="table" />
+            
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -86,8 +57,6 @@ export default function Contact() {
                 <input
                   type="text"
                   name="name"
-                  value={formData.name}
-                  onChange={handleChange}
                   required
                   className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
                 />
@@ -100,8 +69,6 @@ export default function Contact() {
                 <input
                   type="email"
                   name="email"
-                  value={formData.email}
-                  onChange={handleChange}
                   required
                   className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
                 />
@@ -114,8 +81,6 @@ export default function Contact() {
                 <textarea
                   name="message"
                   rows="4"
-                  value={formData.message}
-                  onChange={handleChange}
                   required
                   className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
                 ></textarea>
@@ -127,18 +92,6 @@ export default function Contact() {
               >
                 Send Message
               </button>
-
-              {status && (
-                <p
-                  className={`text-center text-sm mt-3 ${
-                    status.includes("successfully")
-                      ? "text-emerald-600"
-                      : "text-red-500"
-                  }`}
-                >
-                  {status}
-                </p>
-              )}
             </div>
           </form>
         </div>

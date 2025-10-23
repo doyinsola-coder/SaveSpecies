@@ -65,11 +65,11 @@ export default function Contact() {
             </div>
             <div className="flex items-center gap-3 text-gray-700">
               <Phone className="w-5 h-5 text-emerald-500" />
-              <span>+234 800 000 0000</span>
+              <span>+234 9035667678</span>
             </div>
             <div className="flex items-center gap-3 text-gray-700">
               <MapPin className="w-5 h-5 text-emerald-500" />
-              <span>Lagos, Nigeria</span>
+              <span>Kwara, Nigeria</span>
             </div>
           </div>
 

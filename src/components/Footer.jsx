@@ -196,22 +196,23 @@ export function Footer() {
             <span className="font-semibold text-emerald-300">SaveSpecies</span>
             . All rights reserved.
           </p>
-          <div className="flex flex-wrap justify-center gap-6">
-            {[
-              "Privacy Policy",
-              "Terms of Service",
-              "Cookie Policy",
-              "Accessibility",
-            ].map((item) => (
-              <a
-                key={item}
-                href="#"
-                className="hover:text-emerald-300 transition-colors"
-              >
-                {item}
-              </a>
-            ))}
-          </div>
+<div className="flex flex-wrap justify-center gap-6">
+  {[
+    { name: "Privacy Policy", path: "/privacy" },
+    { name: "Terms of Service", path: "/terms" },
+    { name: "Cookie Policy", path: "/cookie" },
+    { name: "Accessibility", path: "/access" },
+  ].map((item) => (
+    <Link
+      key={item.name}
+      to={item.path}
+      className="hover:text-emerald-300 transition-colors"
+    >
+      {item.name}
+    </Link>
+  ))}
+</div>
+
         </motion.div>
       </div>
     </footer>

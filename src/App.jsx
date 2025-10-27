@@ -19,6 +19,10 @@ import EducationalResources from './pages/EducationalResources'
 import ConservationTips from './pages/ConservationTips'
 import AdminDashboard from './pages/AdminDashBoard'
 import { ForgotPasswordPage, ResetPasswordPage } from './pages/ForgotPassword';
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import TermsOfService from './pages/TermsOfService'
+import CookiePolicy from './pages/CookiePolicy'
+import Accessibility from './pages/Accessibility'
 function App() {
 
   return (
@@ -46,6 +50,10 @@ function App() {
 <Route path='/admin' element={<AdminDashboard />} /> 
 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+<Route path="/privacy" element={<PrivacyPolicy />} />
+<Route path="/terms" element={<TermsOfService />} />
+<Route path="/cookie" element={<CookiePolicy />} />
+<Route path="/access" element={<Accessibility />} />
     </Routes>
     <Footer />
     </BrowserRouter>

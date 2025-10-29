@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   BarChart3,
-  Users,
-  AlertTriangle,
   CheckCircle,
   Clock,
   Eye,
@@ -32,17 +30,17 @@ api.interceptors.request.use((config) => {
 
 export default function AdminDashboard() {
   const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
     reviewed: 0,
     resolved: 0,
   });
-  const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedReport, setSelectedReport] = useState(null);
-  const [message, setMessage] = useState("");
 
   useEffect(() => {
     fetchReports();
@@ -168,7 +166,7 @@ export default function AdminDashboard() {
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-emerald-700 mb-2">
-            Admin Dashboard
+            Dashboard
           </h1>
           <p className="text-sm sm:text-base text-gray-600">
             Manage conservation reports and track progress

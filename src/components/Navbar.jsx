@@ -27,6 +27,7 @@ export default function Header() {
     { name: "Take a Pledge", href: "/pledge" },
     { name: "About Us", href: "/about" },
     { name: "Contact", href: "/contact" },
+    {name: "Admin", href: "/admin" }
   ];
 
   const Button = ({ children, variant = "solid", className = "", ...props }) => {

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { User, Mail, Lock, Phone, Home, Heart } from "lucide-react";
+import { User, Mail, Lock, Phone, Home, Heart, Shield } from "lucide-react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 
@@ -13,11 +13,12 @@ export default function SignupPage() {
     phoneNumber: "",
     address: "",
     Gender: "",
+    role: "user", // ✅ Default role
   });
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [showPassword, setShowPassword] = useState(false);
-
   const navigate = useNavigate();
 
   // Handle input change
@@ -26,7 +27,6 @@ export default function SignupPage() {
       ...formData,
       [e.target.name]: e.target.value,
     });
-    // Clear message when user starts typing
     if (message.text) setMessage({ type: "", text: "" });
   };
 
@@ -47,8 +47,7 @@ export default function SignupPage() {
           type: "success",
           text: "✅ Account created successfully!",
         });
-        
-        // Clear form
+
         setFormData({
           name: "",
           email: "",
@@ -56,14 +55,13 @@ export default function SignupPage() {
           phoneNumber: "",
           address: "",
           Gender: "",
+          role: "user", // reset to default
         });
-        
-        // Store token if provided
+
         if (res.data.token) {
           localStorage.setItem("token", res.data.token);
         }
 
-        // Navigate to profile after successful registration
         setTimeout(() => {
           navigate("/profile");
         }, 1500);
@@ -71,47 +69,48 @@ export default function SignupPage() {
     } catch (error) {
       console.error("Error details:", error.response?.data);
 
-      // Handle specific error cases
       if (error.response) {
-        // Server responded with error status
         const status = error.response.status;
         const errorData = error.response.data;
 
-        if (status === 409 || errorData?.message?.toLowerCase().includes("already exists")) {
-          // User already exists
+        if (
+          status === 409 ||
+          errorData?.message?.toLowerCase().includes("already exists")
+        ) {
           setMessage({
             type: "error",
             text: "❌ An account with this email already exists. Try logging in instead.",
           });
         } else if (status === 400) {
-          // Validation error
-          const errorMsg = errorData?.message || errorData?.error || "Invalid input. Please check your details.";
+          const errorMsg =
+            errorData?.message ||
+            errorData?.error ||
+            "Invalid input. Please check your details.";
           setMessage({
             type: "error",
             text: `❌ ${errorMsg}`,
           });
         } else if (status === 500) {
-          // Server error
           setMessage({
             type: "error",
             text: "❌ Server error. Please try again later.",
           });
         } else {
-          // Other errors
-          const errorMsg = errorData?.message || errorData?.error || "Registration failed. Please try again.";
+          const errorMsg =
+            errorData?.message ||
+            errorData?.error ||
+            "Registration failed. Please try again.";
           setMessage({
             type: "error",
             text: `❌ ${errorMsg}`,
           });
         }
       } else if (error.request) {
-        // Request was made but no response received (network error)
         setMessage({
           type: "error",
           text: "❌ Network error. Please check your internet connection and try again.",
         });
       } else {
-        // Something else happened
         setMessage({
           type: "error",
           text: "❌ An unexpected error occurred. Please try again.",
@@ -133,7 +132,9 @@ export default function SignupPage() {
         <div className="text-center mb-6">
           <div className="flex justify-center items-center gap-2 mb-2">
             <Heart className="w-7 h-7 text-emerald-600" />
-            <h2 className="text-2xl font-bold text-emerald-700">Create an Account</h2>
+            <h2 className="text-2xl font-bold text-emerald-700">
+              Create an Account
+            </h2>
           </div>
           <p className="text-gray-500 text-sm">
             Join SaveSpecies and start making a difference 🌿
@@ -186,7 +187,7 @@ export default function SignupPage() {
             />
           </div>
 
-          {/* Password with Eye Toggle */}
+          {/* Password */}
           <div className="flex items-center border rounded-lg p-2 relative">
             <Lock className="w-5 h-5 mr-2 text-emerald-500" />
             <input
@@ -204,7 +205,11 @@ export default function SignupPage() {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 cursor-pointer text-gray-500 hover:text-emerald-600 transition-colors"
             >
-              {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+              {showPassword ? (
+                <AiOutlineEyeInvisible size={20} />
+              ) : (
+                <AiOutlineEye size={20} />
+              )}
             </motion.div>
           </div>
 
@@ -258,6 +263,25 @@ export default function SignupPage() {
             </select>
           </div>
 
+          {/* ✅ Role Selector */}
+          <div className="border rounded-lg p-2 flex justify-between items-center">
+            <label htmlFor="role" className="flex items-center text-gray-600 text-sm gap-1">
+              <Shield className="w-4 h-4 text-emerald-500" />
+              Role:
+            </label>
+            <select
+              name="role"
+              id="role"
+              value={formData.role}
+              onChange={handleChange}
+              disabled={loading}
+              className="outline-none text-gray-700"
+            >
+              <option value="user">User (Default)</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+
           {/* Submit */}
           <motion.button
             type="submit"
@@ -269,7 +293,7 @@ export default function SignupPage() {
           </motion.button>
         </form>
 
-        {/* Animated "Go to Login" Section */}
+        {/* Go to Login */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

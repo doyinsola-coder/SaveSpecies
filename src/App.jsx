@@ -23,6 +23,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfService from './pages/TermsOfService'
 import CookiePolicy from './pages/CookiePolicy'
 import Accessibility from './pages/Accessibility'
+import Unauthorized from './pages/Unauthorized'
 function App() {
 
   return (
@@ -54,6 +55,7 @@ function App() {
 <Route path="/terms" element={<TermsOfService />} />
 <Route path="/cookie" element={<CookiePolicy />} />
 <Route path="/access" element={<Accessibility />} />
+<Route path="/unauthorized" element={<Unauthorized />} />
     </Routes>
     <Footer />
     </BrowserRouter>
